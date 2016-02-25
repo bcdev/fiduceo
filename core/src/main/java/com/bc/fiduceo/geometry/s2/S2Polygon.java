@@ -31,6 +31,8 @@ import java.util.ArrayList;
 
 class S2Polygon implements Polygon {
 
+    private Boolean valid;
+
     private final com.google.common.geometry.S2Polygon googlePolygon;
 
     S2Polygon(Object geometry) {
@@ -52,6 +54,10 @@ class S2Polygon implements Polygon {
 
     @Override
     public Geometry intersection(Geometry other) {
+        if (!isValid()) {
+            throw new RuntimeException("Geometry is not valid.");
+        }
+
         final com.google.common.geometry.S2Polygon intersection = new com.google.common.geometry.S2Polygon();
         intersection.initToIntersection(googlePolygon, (com.google.common.geometry.S2Polygon) other.getInner());
         return new S2Polygon(intersection);
@@ -69,6 +75,10 @@ class S2Polygon implements Polygon {
 
     @Override
     public boolean isValid() {
+        if (valid != null) {
+            return valid;
+        }
+
         final int numLoops = googlePolygon.numLoops();
         final ArrayList<S2Loop> loops = new ArrayList<>();
         for (int i = 0; i < numLoops; i++) {
@@ -79,7 +89,8 @@ class S2Polygon implements Polygon {
             loops.add(loop);
         }
 
-        return com.google.common.geometry.S2Polygon.isValid(loops);
+        valid = com.google.common.geometry.S2Polygon.isValid(loops);
+        return valid;
     }
 
     @Override

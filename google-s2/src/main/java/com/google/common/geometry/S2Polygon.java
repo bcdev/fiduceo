@@ -773,8 +773,8 @@ public final strictfp class S2Polygon implements S2Region, Comparable<S2Polygon>
         S2PolygonBuilder.Options options = S2PolygonBuilder.Options.DIRECTED_XOR;
         options.setMergeDistance(vertexMergeRadius);
         S2PolygonBuilder builder = new S2PolygonBuilder(options);
-        clipBoundary(a, false, b, false, true, true, builder);
-        clipBoundary(b, false, a, false, true, false, builder);
+        clipBoundary(a, false, b, false, false, true, builder);
+        clipBoundary(b, false, a, false, false, false, builder);
         if (!builder.assemblePolygon(this, null)) {
             // TODO (andriy): do something more meaningful here.
             log.severe("Bad directed edges");

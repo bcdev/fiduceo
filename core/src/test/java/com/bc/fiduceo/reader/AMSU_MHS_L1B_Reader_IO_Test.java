@@ -58,10 +58,11 @@ public class AMSU_MHS_L1B_Reader_IO_Test {
     }
 
     @Test
-    public void testAcqusitionInfo() throws IOException, ParseException {
+    public void testAcquisitionInfo() throws IOException, ParseException {
         final AcquisitionInfo acquisitionInfo = reader.read();
 
         final List<Point> coordinates = acquisitionInfo.getCoordinates();
+
         assertNotNull(coordinates);
         assertEquals(118, coordinates.size());
         assertCoordinate(-108.08909726943968, -72.57329816664424, coordinates.get(0));

@@ -21,6 +21,8 @@
 package com.bc.fiduceo.reader;
 
 import com.bc.fiduceo.core.Interval;
+import com.bc.fiduceo.geometry.*;
+import com.bc.fiduceo.geometry.GeometryUtils;
 import com.bc.fiduceo.geometry.GeometryFactory;
 import org.esa.snap.core.datamodel.GeoCoding;
 import org.esa.snap.core.datamodel.ProductData;
@@ -36,6 +38,7 @@ import ucar.nc2.Variable;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
@@ -52,11 +55,12 @@ public class AMSU_MHS_L1B_Reader implements Reader {
 
     private final BoundingPolygonCreator boundingPolygonCreator;
     private NetcdfFile netcdfFile;
+    private final GeometryFactory geometryFactory;
 
 
     public AMSU_MHS_L1B_Reader() {
         // @todo 2 tb/tb inject geometry factory 2016-02-25
-        final GeometryFactory geometryFactory = new GeometryFactory(GeometryFactory.Type.S2);
+        geometryFactory = new GeometryFactory(GeometryFactory.Type.S2);
         boundingPolygonCreator = new BoundingPolygonCreator(new Interval(IntervalX, IntervalY), geometryFactory);
         netcdfFile = null;
     }
@@ -182,6 +186,21 @@ public class AMSU_MHS_L1B_Reader implements Reader {
         List<ArrayDouble.D2> lat_long = getLat_Long(netcdfFile);
         ArrayDouble.D2 arrayDoubleLongitude = lat_long.get(0);
         ArrayDouble.D2 arrayDoubleLatitude = lat_long.get(1);
+
+        final List<Point> boundaryPoints = boundingPolygonCreator.extractBoundaryPoints(arrayDoubleLatitude, arrayDoubleLongitude);
+        final Polygon polygon = geometryFactory.createPolygon(boundaryPoints);
+        final Polygon testPolygon = (Polygon) geometryFactory.parse("POLYGON((-1 -10, 1 10, 10 10, 10 -1, -1 -10))");
+        final Geometry intersection = polygon.intersection(testPolygon);
+
+        System.out.println("wkt = " + GeometryUtils.plotPolygon(Arrays.asList(testPolygon.getCoordinates())));
+        System.out.println("wkt = " + GeometryUtils.plotPolygon(boundaryPoints));
+        System.out.println("wkt = " + GeometryUtils.plotPolygon(Arrays.asList(intersection.getCoordinates())));
+        final boolean empty = intersection.isEmpty();
+        System.out.println("empty = " + empty);
+        if (!polygon.isValid()) {
+            // @todo 1 tb/tb handle refinement of geometry 2016-02-24
+            throw new RuntimeException("code branch not implemented");
+        }
 
         final AcquisitionInfo acquisitionInfo = boundingPolygonCreator.createBoundingPolygon(arrayDoubleLatitude,
                 arrayDoubleLongitude);

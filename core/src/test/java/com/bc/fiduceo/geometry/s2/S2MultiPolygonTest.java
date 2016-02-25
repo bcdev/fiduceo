@@ -1,9 +1,9 @@
 package com.bc.fiduceo.geometry.s2;
 
 import com.bc.fiduceo.geometry.Geometry;
+import com.bc.fiduceo.geometry.GeometryUtils;
 import com.bc.fiduceo.geometry.Point;
 import com.bc.fiduceo.geometry.Polygon;
-import com.bc.fiduceo.reader.BoundingPolygonCreator;
 import com.bc.geometry.s2.S2WKTReader;
 import com.google.common.geometry.S2Polyline;
 import org.junit.Test;
@@ -125,7 +125,7 @@ public class S2MultiPolygonTest {
         List<Polygon> s2PolygonList = new ArrayList<>();
         s2PolygonList.add(createS2Polygon("POLYGON ((10 10, 80 10, 80 80, 10 80))"));
         s2PolygonList.add(createS2Polygon("POLYGON((-8 -10,-8 12,9 12,9 -10,-8 -10))"));
-        String multiPolygon = BoundingPolygonCreator.plotMultiPolygon(s2PolygonList);
+        String multiPolygon = GeometryUtils.plotMultiPolygon(s2PolygonList);
         assertEquals("MULTIPOLYGON(((9.999999999999998 10.0,80.0 10.0,80.0 80.0,10.0 80.0)),((9.0 -10.0,9.000000000000002 12.000000000000002,-7.999999999999998 12.000000000000002,-7.999999999999998 -10.0)))", multiPolygon);
 
     }

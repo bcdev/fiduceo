@@ -49,13 +49,48 @@ public class BoundingPolygonCreator {
         this.intervalY = interval.getY();
 
         this.geometryFactory = geometryFactory;
-
     }
 
     static void closePolygon(List<Point> coordinates) {
         if (coordinates.size() > 1) {
             coordinates.add(coordinates.get(0));
         }
+    }
+
+    public List<Point> extractBoundaryPoints(ArrayDouble.D2 latitude, ArrayDouble.D2 longitude) {
+        final List<Point> result = new ArrayList<>();
+
+        final int[] shape = latitude.getShape();
+        int width = shape[1];
+        int height = shape[0];
+
+        for (int y = 0; y < height; y += intervalY) {
+            final double lon = longitude.get(y, 0);
+            final double lat = latitude.get(y, 0);
+            result.add(geometryFactory.createPoint(lon, lat));
+        }
+
+        for (int x = 0; x < width; x += intervalX) {
+            final int maxY = height - 1;
+            final double lon = longitude.get(maxY, x);
+            final double lat = latitude.get(maxY, x);
+            result.add(geometryFactory.createPoint(lon, lat));
+        }
+
+        for (int y = height -1; y >= 0; y -= intervalY) {
+            final int maxX = width - 1;
+            final double lon = longitude.get(y, maxX);
+            final double lat = latitude.get(y, maxX);
+            result.add(geometryFactory.createPoint(lon, lat));
+        }
+
+        for (int x = width -1; x >= 0; x -= intervalX) {
+            final double lon = longitude.get(0, x);
+            final double lat = latitude.get(0, x);
+            result.add(geometryFactory.createPoint(lon, lat));
+        }
+
+        return result;
     }
 
     public static boolean isPointValidation(List<Polygon> polygonList) {
@@ -73,56 +108,6 @@ public class BoundingPolygonCreator {
         return valid;
     }
 
-    public static String plotMultiPolygon(List<Polygon> polygonList) {
-        final StringBuilder stringBuffer = new StringBuilder();
-        stringBuffer.append("MULTIPOLYGON(");
-
-        for (int j = 0; j < polygonList.size(); j++) {
-            Polygon polygon = polygonList.get(j);
-            final Point[] points = polygon.getCoordinates();
-            stringBuffer.append("((");
-            for (int i = 0; i < points.length; i++) {
-                Point coordinate = points[i];
-                stringBuffer.append(coordinate.getLon());
-                stringBuffer.append(" ");
-                stringBuffer.append(coordinate.getLat());
-                if (i < points.length - 1) {
-                    stringBuffer.append(",");
-                }
-            }
-            stringBuffer.append("))");
-            if (j < polygonList.size() - 1) {
-                stringBuffer.append(",");
-            }
-        }
-        stringBuffer.append(")");
-        return stringBuffer.toString();
-    }
-
-
-    public static String plotPolygon(List<Point> points) {
-        final StringBuilder stringBuffer = new StringBuilder();
-        stringBuffer.append("POLYGON((");
-
-        for (int j = 0; j < points.size(); j++) {
-            stringBuffer.append(points.get(j).getLon());
-            stringBuffer.append(" ");
-            stringBuffer.append(points.get(j).getLat());
-            if (j < points.size() - 1) {
-                stringBuffer.append(",");
-            }
-
-            if (j == (points.size() - 1)) {
-                stringBuffer.append(",");
-                stringBuffer.append(points.get(0).getLon());
-                stringBuffer.append(" ");
-                stringBuffer.append(points.get(0).getLat());
-            }
-        }
-        stringBuffer.append("))");
-
-        return stringBuffer.toString();
-    }
 
     public List<Point> allBoundingPoint(ArrayDouble.D2 arrayLatitude, ArrayDouble.D2 arrayLongitude,
                                         NodeType nodeType,

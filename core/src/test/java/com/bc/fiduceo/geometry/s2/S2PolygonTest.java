@@ -3,11 +3,13 @@ package com.bc.fiduceo.geometry.s2;
 import static org.junit.Assert.*;
 
 import com.bc.fiduceo.geometry.Geometry;
+import com.bc.fiduceo.geometry.GeometryUtils;
 import com.bc.fiduceo.geometry.Point;
 import com.bc.geometry.s2.S2WKTReader;
 import org.junit.*;
 
 import java.io.IOException;
+import java.util.Arrays;
 
 /**
  * @author tom.bc
@@ -49,28 +51,28 @@ public class S2PolygonTest {
         assertFalse(intersection.isEmpty());
 
         Point[] coordinates = intersection.getCoordinates();
-        assertEquals(7, coordinates.length);
-        assertEquals(-4.0, coordinates[0].getLon(), 1e-8);
-        assertEquals(0.0, coordinates[0].getLat(), 1e-8);
+        assertEquals(5, coordinates.length);
+        assertEquals(-4.5, coordinates[0].getLon(), 1e-8);
+        assertEquals(1.0, coordinates[0].getLat(), 1e-8);
 
-        assertEquals(-4.7499999999998925, coordinates[2].getLon(), 1e-8);
-        assertEquals(1.0000285529444368, coordinates[2].getLat(), 1e-8);
+        assertEquals(-5.0, coordinates[2].getLon(), 1e-8);
+        assertEquals(1.0, coordinates[2].getLat(), 1e-8);
     }
 
     @Test
     public void testIntersect_intersectionNorth() {
         final S2Polygon s2Polygon_1 = createS2Polygon("POLYGON((-10 -10,-10 10,10 10,10 -10,-10 -10))");
-        final S2Polygon s2Polygon_2 = createS2Polygon("POLYGON((-8 -10,-8 12,9 12,9 -10,-8 -10))");
+        final S2Polygon s2Polygon_2 = createS2Polygon("POLYGON((-8 -10,-8 12, 9 12,9 -10,-8 -10))");
 
         Geometry intersection = s2Polygon_1.intersection(s2Polygon_2);
+        System.out.println(GeometryUtils.plotPolygon(Arrays.asList(intersection.getCoordinates())));
         assertNotNull(intersection);
         assertFalse(intersection.isEmpty());
         Point[] coordinates = intersection.getCoordinates();
-        assertEquals(-9.999999999999998, coordinates[0].getLon(), 1e-8);
-        assertEquals(10.0, coordinates[0].getLat(), 1e-8);
-        assertEquals(9.999999999999998, coordinates[2].getLon(), 1e-8);
+        assertEquals(9, coordinates[0].getLon(), 1e-8);
+        assertEquals(10.028657322246222, coordinates[0].getLat(), 1e-8);
+        assertEquals(-8, coordinates[2].getLon(), 1e-8);
         assertEquals(-10.0, coordinates[2].getLat(), 1e-8);
-
     }
 
     @Test
@@ -94,13 +96,26 @@ public class S2PolygonTest {
     }
 
     @Test
-    public void testSamePolygon() {
+    public void testIntersectSamePolygon() {
         final S2Polygon s2Polygon_1 = createS2Polygon("POLYGON((-10 -10,-10 10,10 10,10 -10,-10 -10))");
         final S2Polygon s2Polygon_2 = createS2Polygon("POLYGON((10 10,-10 10,-10 -10,10 -10,10 10))");
 
         Geometry intersection = s2Polygon_1.intersection(s2Polygon_2);
         assertNotNull(intersection);
         assertEquals(intersection.toString(), "Polygon: (0) loops:\n");
+    }
+
+    @Test
+    public void testIntersect_throwsOnSelfIntersectingPolygon() throws Exception {
+        final S2Polygon s2Polygon = createS2Polygon("POLYGON((0 0, 4 0, 4 3, 1 3, 3 1, 2 1, 2 4, 0 4, 0 0))");
+        assertEquals(false, s2Polygon.isValid());
+        final S2Polygon toIntersect = createS2Polygon("POLYGON((1 4,2 4,2 3,1 3,1 4))");
+
+        try {
+            s2Polygon.intersection(toIntersect);
+            fail("RuntimeException expected");
+        } catch (RuntimeException expected) {
+        }
     }
 
     @Test

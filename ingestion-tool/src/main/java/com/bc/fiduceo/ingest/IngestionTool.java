@@ -147,8 +147,6 @@ class IngestionTool {
             reader.open(file);
             try {
                 final AcquisitionInfo acquisitionInfo = reader.read();
-                final Polygon polygon = geometryFactory.createPolygon(acquisitionInfo.getCoordinates());
-
 
                 // build polygon from list of points
                 // test if polygon is valid
