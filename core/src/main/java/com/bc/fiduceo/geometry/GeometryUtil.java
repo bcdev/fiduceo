@@ -65,6 +65,36 @@ public class GeometryUtil {
         return builder.toString();
     }
 
+    public static String toKml(LineString lineString) {
+        final StringBuilder builder = new StringBuilder();
+
+        builder.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
+        builder.append("<kml xmlns=\"http://www.opengis.net/kml/2.2\">\n");
+        builder.append("<Document>\n");
+        builder.append("  <Placemark>\n");
+        builder.append("    <LineString>\n");
+        builder.append("      <extrude>1</extrude>\n");
+        builder.append("      <tessellate>1</tessellate>\n");
+        builder.append("        <coordinates>\n");
+
+        final Point[] coordinates = lineString.getCoordinates();
+        for (final Point coordinate : coordinates) {
+            builder.append("          ");
+            builder.append(coordinate.getLon());
+            builder.append(",");
+            builder.append(coordinate.getLat());
+            builder.append(",0\n");
+        }
+
+        builder.append("        </coordinates>\n");
+        builder.append("    </LineString>\n");
+        builder.append("  </Placemark>\n");
+        builder.append("</Document>\n");
+        builder.append("</kml>");
+
+        return builder.toString();
+    }
+
     public static String toKml(float[] lats, float[] lons) {
         final StringBuilder builder = new StringBuilder();
         builder.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");

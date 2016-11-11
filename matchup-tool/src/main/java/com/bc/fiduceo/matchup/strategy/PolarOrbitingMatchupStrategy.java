@@ -104,8 +104,6 @@ class PolarOrbitingMatchupStrategy extends AbstractMatchupStrategy {
                         }
 
 
-
-
                         final MatchupSet matchupSet = new MatchupSet();
                         matchupSet.setPrimaryObservationPath(primaryObservation.getDataFilePath());
                         matchupSet.setSecondaryObservationPath(secondaryObservation.getDataFilePath());
