@@ -37,9 +37,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Date;
 
-/**
- * Created by tom on 14.11.2016.
- */
+
 public class TimeDiffCalculator {
 
     public static void main(String[] args) throws IOException, InvalidRangeException {
@@ -74,12 +72,10 @@ public class TimeDiffCalculator {
 
                 final Array lonArray = reader.readRaw(x, lineNumber, interval, "lon");
                 final Index lonIndex = lonArray.getIndex();
-                // lonIndex.set(0,0,0);
                 final float lon = lonArray.getFloat(lonIndex);
 
                 final Array latArray = reader.readRaw(x, lineNumber, interval, "lat");
                 final Index latIndex = latArray.getIndex();
-                //latIndex.set(0,0,0);
                 final float lat = latArray.getFloat(latIndex);
 
                 //System.out.println("location = " + lon + " " + lat);
