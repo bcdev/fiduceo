@@ -111,7 +111,7 @@ public class IntersectionEngine {
     }
 
     // package access for testing only tb 2015-09-04
-    static int calculateTimeDelta(TimeInterval interval_1, TimeInterval interval_2) {
+    public static int calculateTimeDelta(TimeInterval interval_1, TimeInterval interval_2) {
         TimeInterval earlier;
         TimeInterval later;
         if (interval_1.getStartTime().before(interval_2.getStartTime())) {

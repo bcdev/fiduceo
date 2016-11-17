@@ -29,6 +29,7 @@ import com.bc.fiduceo.db.Storage;
 import com.bc.fiduceo.geometry.GeometryFactory;
 import com.bc.fiduceo.log.FiduceoLogger;
 import com.bc.fiduceo.matchup.strategy.AbstractMatchupStrategy;
+import com.bc.fiduceo.matchup.strategy.AncientMatchupStrategy;
 import com.bc.fiduceo.matchup.strategy.MatchupStrategyFactory;
 import com.bc.fiduceo.matchup.writer.AcquisitionTimeReadingIOVariable;
 import com.bc.fiduceo.matchup.writer.CenterXWritingIOVariable;
@@ -48,6 +49,7 @@ import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
+import org.esa.snap.core.util.StopWatch;
 import org.esa.snap.core.util.StringUtils;
 import ucar.ma2.DataType;
 import ucar.ma2.InvalidRangeException;
@@ -357,7 +359,14 @@ class MatchupTool {
         final UseCaseConfig useCaseConfig = context.getUseCaseConfig();
 
         final AbstractMatchupStrategy matchupStrategy = MatchupStrategyFactory.get(useCaseConfig, logger);
+        //final AbstractMatchupStrategy matchupStrategy = new AncientMatchupStrategy(logger);
+
+        final StopWatch stopWatch = new StopWatch();
+        stopWatch.start();
         final MatchupCollection matchupCollection = matchupStrategy.createMatchupCollection(context);
+
+        stopWatch.stop();
+        logger.info("Matchup processing: " + stopWatch.getTimeDiffString());
 
         if (matchupCollection.getNumMatchups() == 0) {
             logger.warning("No matchups in time interval, creation of MMD file skipped.");

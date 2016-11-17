@@ -82,27 +82,16 @@ class PolarOrbitingMatchupStrategy extends AbstractMatchupStrategy {
 
                 primaryReader.open(primaryObservation.getDataFilePath().toFile());
 
-                System.out.println(primaryObservation.getSensor().getName() + "  ------------------------");
-                if (!isPrimarySegmented) {
-                    System.out.println(GeometryUtil.toKml((Polygon) primaryGeoBounds));
-                } else {
-                    final GeometryCollection geometryCollection = (GeometryCollection) primaryGeoBounds;
-                    final Geometry[] geometries = geometryCollection.getGeometries();
-                    for (final Geometry geometry : geometries) {
-                        System.out.println(GeometryUtil.toKml((Polygon) geometry));
-                    }
-                }
-
                 final List<SatelliteObservation> secondaryObservations = getSecondaryObservations(context, searchTimeStart, searchTimeEnd);
                 for (final SatelliteObservation secondaryObservation : secondaryObservations) {
                     try (Reader secondaryReader = readerFactory.getReader(secondaryObservation.getSensor().getName())) {
-                        secondaryReader.open(secondaryObservation.getDataFilePath().toFile());
 
                         final Intersection[] intersectingIntervals = IntersectionEngine.getIntersectingIntervals(primaryObservation, secondaryObservation);
                         if (intersectingIntervals.length == 0) {
                             continue;
                         }
 
+                        secondaryReader.open(secondaryObservation.getDataFilePath().toFile());
 
                         final MatchupSet matchupSet = new MatchupSet();
                         matchupSet.setPrimaryObservationPath(primaryObservation.getDataFilePath());
@@ -111,17 +100,6 @@ class PolarOrbitingMatchupStrategy extends AbstractMatchupStrategy {
                         // @todo 2 tb/tb extract method
                         final Geometry secondaryGeoBounds = secondaryObservation.getGeoBounds();
                         final boolean isSecondarySegmented = AbstractMatchupStrategy.isSegmented(secondaryGeoBounds);
-
-                        System.out.println(secondaryObservation.getSensor().getName() + "  ------------------------");
-                        if (!isSecondarySegmented) {
-                            System.out.println(GeometryUtil.toKml((Polygon) secondaryGeoBounds));
-                        } else {
-                            final GeometryCollection geometryCollection = (GeometryCollection) secondaryGeoBounds;
-                            final Geometry[] geometries = geometryCollection.getGeometries();
-                            for (final Geometry geometry : geometries) {
-                                System.out.println(GeometryUtil.toKml((Polygon) geometry));
-                            }
-                        }
 
                         for (final Intersection intersection : intersectingIntervals) {
                             final TimeInfo timeInfo = intersection.getTimeInfo();
